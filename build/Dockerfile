@@ -32,5 +32,8 @@ USER 0
 COPY startapp.sh /startapp.sh
 RUN chmod +x /startapp.sh
 
+# 系统级 D-Bus（Electron 通知/设备枚举需要；缺失会刷 bus.cc 错误）
+RUN mkdir -p /run/dbus && printf '#!/bin/sh\ndbus-daemon --system --fork 2>/dev/null || true\n' > /etc/cont-init.d/05-system-dbus && chmod +x /etc/cont-init.d/05-system-dbus
+
 # 构建期机器校验：主二进制任何缺失库都让构建立即失败（不再靠运行时逐个试）
 RUN ldd /opt/cindy-build/.local/opt/cindy/current/Cindy | grep 'not found' && exit 1 || echo 'ALL_SHARED_LIBS_OK'
