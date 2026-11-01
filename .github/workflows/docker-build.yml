@@ -4,11 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
-jobs:
+jabs:
   build-push:
     runs-on: ubuntu-latest
     permissions:
@@ -32,8 +28,9 @@ jobs:
         with:
           context: ./build
           push: true
+          # GHCS 默认畭八怬点︁评逅Id (历史错误)
           tags: |
-            ghcr.io/${{ env.IMAGE_NAME }}:latest
-            ghcr.io/${{ env.IMAGE_NAME }}:0.1.121-cn
+            ghcr.io/observe-life/cindy-container:latest
+            ghcr.io/observe-life/cindy-container:0.1.121-cn
           cache-from: type=gha
           cache-to: type=gha,mode=max
