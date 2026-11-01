@@ -27,6 +27,6 @@ RUN set -eu; \
     rm -f /tmp/cindy.deb /tmp/install-user.sh; \
     ls -la /config/.local/opt/cindy/
 
-USER root
+USER 0
 COPY startapp.sh /startapp.sh
 RUN chmod +x /startapp.sh
