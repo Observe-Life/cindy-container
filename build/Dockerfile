@@ -14,18 +14,18 @@ RUN add-pkg curl ca-certificates dbus dbus-x11 gnome-keyring libsecret-1-0 libar
     libnss3 libgtk-3-0 libasound2 libxss1 libxtst6 libnotify4 libdrm2 libgl1 && \
     sed -i 's/^# *zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
-RUN mkdir -p /config && chown 1000:1000 /config
+RUN mkdir -p /config /opt/cindy-build && chown 1000:1000 /config /opt/cindy-build
 
 USER 1000
-ENV HOME=/config LANG=zh_CN.UTF-8
+ENV HOME=/opt/cindy-build LANG=zh_CN.UTF-8
 # 同一层内完成：下载官方 .deb → 校验 → 官方安装器安装 → 清理（deb 不残留在镜像层）
 RUN set -eu; \
     curl -fsSL "$CINDY_DEB_URL" -o /tmp/cindy.deb; \
     echo "${CINDY_SHA256}  /tmp/cindy.deb" | sha256sum -c -; \
     curl -fsSL "https://raw.githubusercontent.com/makecindy/cindy/v${CINDY_VERSION}/apps/desktop/resources/linux/install-user.sh" -o /tmp/install-user.sh; \
-    bash /tmp/install-user.sh --install /tmp/cindy.deb "${CINDY_SHA256}" /config/.local/opt/cindy; \
+    bash /tmp/install-user.sh --install /tmp/cindy.deb "${CINDY_SHA256}" /opt/cindy-build/.local/opt/cindy; \
     rm -f /tmp/cindy.deb /tmp/install-user.sh; \
-    ls -la /config/.local/opt/cindy/
+    ls -la /opt/cindy-build/.local/opt/cindy/
 
 USER 0
 COPY startapp.sh /startapp.sh
