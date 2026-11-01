@@ -2,7 +2,7 @@
 # Cindy 启动：D-Bus 会话总线 + 解锁 keyring（Secret Service）+ 无沙箱 + 显式凭据后端
 set -e
 PREFIX="${CINDY_PREFIX:-/opt/cindy-build/.local/opt/cindy}"
-LAUNCH="$PREFIX/current/launch"
+LAUNCH="$PREFIX/launch"
 [ -x "$LAUNCH" ] || { echo "[startapp] launcher 缺失: $LAUNCH"; ls -la "$PREFIX" || true; exit 1; }
 
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-$(id -u)}"
