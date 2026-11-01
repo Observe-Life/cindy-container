@@ -11,7 +11,8 @@ ARG CINDY_DEB_URL=https://hotfix.cindy.com.cn/cindy/app/linux-x64/cindy-0.1.121-
 # D-Bus 会话 + Secret Service + 官方安装器依赖 + Electron 运行库（对照官方 docs/linux.md）+ 中文环境
 RUN add-pkg curl ca-certificates dbus dbus-x11 gnome-keyring libsecret-1-0 libarchive-tools \
     procps findutils util-linux locales desktop-file-utils xdg-utils \
-    libnss3 libgtk-3-0 libasound2 libxss1 libxtst6 libnotify4 libdrm2 libgl1 && \
+    libnss3 libnspr4 libgtk-3-0 libasound2 libxss1 libxtst6 libnotify4 libdrm2 libgl1 libgbm1 \
+    libatk1.0-0 libatk-bridge2.0-0 libcups2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 && \
     sed -i 's/^# *zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
 RUN mkdir -p /config /opt/cindy-build && chown 1000:1000 /config /opt/cindy-build
@@ -30,3 +31,6 @@ RUN set -eu; \
 USER 0
 COPY startapp.sh /startapp.sh
 RUN chmod +x /startapp.sh
+
+# 构建期机器校验：主二进制任何缺失库都让构建立即失败（不再靠运行时逐个试）
+RUN ldd /opt/cindy-build/.local/opt/cindy/current/Cindy | grep 'not found' && exit 1 || echo 'ALL_SHARED_LIBS_OK'
