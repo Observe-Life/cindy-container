@@ -4,7 +4,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
-jabs:
+env:
+  CINDY_VERSION: "0.1.121"
+  CINDY_SHA256: "941e55bc2381c87460c5c6087a48e55f4d503735982a7363bd4b7c808c2d2b14"
+
+jobs:
   build-push:
     runs-on: ubuntu-latest
     permissions:
@@ -12,6 +16,19 @@ jabs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download official Cindy .deb
+        run: |
+          set -euo pipefail
+          F="cindy-${CINDY_VERSION}-amd64.deb"
+          for U in \
+            "https://hotfix.cindy.com.cn/cindy/app/linux-x64/${F}" \
+            "https://hotfix.cindy.app/cindy/app/linux-x64/${F}"; do
+            echo "trying $U"
+            if curl -fsSL --retry 3 --max-time 600 "$U" -o "build/${F}"; then ok=1; break; fi
+          done
+          [ "${ok:-}" = "1" ] || { echo "deb download failed"; exit 1; }
+          echo "${CINDY_SHA256}  build/${F}" | sha256sum -c -
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -28,7 +45,6 @@ jabs:
         with:
           context: ./build
           push: true
-          # GHCS 默认畭八怬点︁评逅Id (历史错误)
           tags: |
             ghcr.io/observe-life/cindy-container:latest
             ghcr.io/observe-life/cindy-container:0.1.121-cn
